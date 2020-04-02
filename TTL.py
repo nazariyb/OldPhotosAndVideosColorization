@@ -1,0 +1,4 @@
+
+
+def TTL():
+    return print
