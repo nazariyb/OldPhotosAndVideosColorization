@@ -13,7 +13,7 @@ def random_uniform(shape, low, high):
     return result
 
 class MemoryNetwork:
-    def __init__(self, memory_size, top_k=256):
+    def __init__(self, memory_size, top_k=1):
         self.memory_size = memory_size
         self.K = F.normalize(random_uniform((self.memory_size, 512), -0.01, 0.01), dim=1)
         self.V = F.normalize(random_uniform((self.memory_size, 313), 0, 0.01), p = 1, dim=1)
