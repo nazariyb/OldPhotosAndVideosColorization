@@ -1,14 +1,22 @@
 import numpy as np
 import random as R
 from sklearn.metrics.pairwise import cosine_similarity
+from torch.nn import functional as F
+import torch
 
 from utils import KL_divergence
+
+def random_uniform(shape, low, high):
+    x = torch.rand(*shape)
+    result = (high - low) * x + low
+    
+    return result
 
 class MemoryNetwork:
     def __init__(self, memory_size, top_k=256):
         self.memory_size = memory_size
-        self.K = np.array([None for _ in range(self.memory_size)])
-        self.V = np.array([None for _ in range(self.memory_size)])
+        self.K = F.normalize(random_uniform((self.memory_size, 512), -0.01, 0.01), dim=1)
+        self.V = F.normalize(random_uniform((self.memory_size, 313), 0, 0.01), p = 1, dim=1)
         self.A = np.array([0 for _ in range(self.memory_size)])
         self.top_k = top_k
 
@@ -27,6 +35,7 @@ class MemoryNetwork:
         self.K[case1] = (q + self.K[case1]) / np.sqrt(np.power(q[case1] + self.K[case1], 2))
         self.A[case1] = 0
 
+        # case 2 otherwise
         r = self.pick_the_oldest(len(case2))
         self.K[r] = q[case2]
         self.V[r] = v[case2]
@@ -38,13 +47,14 @@ class MemoryNetwork:
         return np.array(age_values)[:num2pick, 0]
 
     def dist(self, q, k):
-        return cosine_similarity(q, self.K[k])
+        print('q shape:', q.shape)
+        print('K shape:', self.K[k.long()].shape)
+        return cosine_similarity(q.reshape(-1, 1), self.K[k.long()].reshape(-1, 1))
 
     def get_neighbors(self, q, num_neighbors=1):
         distances = []
-        for i, k in enumerate(self.K):
-            dist = self.dist(q[i], k)
-            distances.append(np.array([i, dist]))
-        distances.sort(key=lambda x: x[1])
+        for j, q_ in enumerate(q):
+            q_dist = self.dist(q_, self.K)
+            distances.append(np.array(q_dist.argsort())[-num_neighbors:][::-1])
         distances = np.array(distances)
-        return distances[:num_neighbors, 0]
+        return distances

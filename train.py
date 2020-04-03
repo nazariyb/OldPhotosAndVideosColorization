@@ -5,6 +5,7 @@ def train(data_loader, resnet18, memnetwork, criterion, optimizer, loss_threshol
     for data_instance in data_loader:
         color_feature = data_instance['color_feat']
         resnet_inp = data_instance['resnet_inp']
+        print(resnet_inp.shape)
         idx = data_instance['index']
 
         print('get resnet out')
