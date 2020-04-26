@@ -37,6 +37,8 @@ class ColorDataset(torch.utils.data.Dataset):
         print('ab shape:', ab.shape)
         print('starting quantizing...')
         color_feature = np.mean(quantize_colors(ab, 313), axis=(0,1))
+        # color_feature = np.mean(Image.fromarray(np.uint8(ab)).quantize(313), axis=(0,1))
+        print('COLOR feature', color_feature.shape)
         print('finished quantizing...')
 
         gray_image = [img_lab[:,:,:1]]

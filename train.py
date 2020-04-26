@@ -2,6 +2,7 @@ import torch
 
 
 def train(data_loader, resnet18, memnetwork, criterion, optimizer, loss_threshold=.7):
+    i = 0
     for data_instance in data_loader:
         color_feature = data_instance['color_feat']
         resnet_inp = data_instance['resnet_inp']
@@ -24,5 +25,7 @@ def train(data_loader, resnet18, memnetwork, criterion, optimizer, loss_threshol
             img_feature = resnet18(resnet_inp)
             print('update')
             memnetwork.update(img_feature, color_feature, loss_threshold, idx)
+        if i == 10:
+            break
+        i += 1
         print('done')
-        break
